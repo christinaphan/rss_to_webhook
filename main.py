@@ -10,8 +10,8 @@ load_dotenv()
 
 DISCORD_WEBHOOK_URL = os.environ["DISCORD_WEBHOOK_URL"]
 
-FEED_INFO_FILE = "./feed_info.csv"
-LAST_SEEN_FILE = "./last_seen.csv"
+FEED_INFO_FILE = os.environ["FEED_INFO_FILE"]
+LAST_SEEN_FILE = os.environ["LAST_SEEN_FILE"]
 
 # Default feeds
 default_feeds = [
