@@ -13,17 +13,19 @@ DISCORD_WEBHOOK_URL = os.environ["DISCORD_WEBHOOK_URL"]
 FEED_INFO_FILE = os.environ["FEED_INFO_FILE"]
 LAST_SEEN_FILE = os.environ["LAST_SEEN_FILE"]
 
-# Default feeds
 default_feeds = [
     "https://feeds.feedburner.com/TheDailyWtf",
     "https://xkcd.com/atom.xml",
     "https://hnrss.org/frontpage?description=0&count=5",
+    "https://neovim.io/news.xml",
 ]
 
 # Load feed metadata
 feed_urls = []
 feed_etags = []
 feed_last_modified = []
+
+feed_data = {}  # url -> (etag, last_modified)
 
 if os.path.exists(FEED_INFO_FILE):
     with open(FEED_INFO_FILE, "r") as f:
@@ -34,13 +36,16 @@ if os.path.exists(FEED_INFO_FILE):
             url = row[0]
             etag = row[1] if len(row) > 1 else ""
             last_mod = row[2] if len(row) > 2 else ""
-            feed_urls.append(url)
-            feed_etags.append(etag)
-            feed_last_modified.append(last_mod)
-else:
-    feed_urls = default_feeds
-    feed_etags = ["" for _ in feed_urls]
-    feed_last_modified = ["" for _ in feed_urls]
+            feed_data[url] = (etag, last_mod)
+
+# add remaining urls from default feed
+for url in default_feeds:
+    if url not in feed_data:
+        feed_data[url] = ("", "")
+
+feed_urls = list(feed_data.keys())
+feed_etags = [feed_data[url][0] for url in feed_urls]
+feed_last_modified = [feed_data[url][1] for url in feed_urls]
 
 last_seen_ids = {}
 if os.path.exists(LAST_SEEN_FILE):
@@ -54,7 +59,6 @@ new_feed_etags = []
 new_feed_last_modified = []
 new_last_seen_ids = {}
 
-# Main loop
 for feed_url, etag, last_mod in zip(feed_urls, feed_etags, feed_last_modified):
     d = feedparser.parse(feed_url, etag=etag, modified=last_mod)
 
