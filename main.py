@@ -18,6 +18,7 @@ default_feeds = [
     "https://xkcd.com/atom.xml",
     "https://hnrss.org/frontpage?description=0&count=5",
     "https://neovim.io/news.xml",
+    "https://pagedout.institute/rss.xml",
 ]
 
 # Load feed metadata
